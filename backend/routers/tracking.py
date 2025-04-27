@@ -57,3 +57,46 @@ async def satellite_trajectory(norad_id: int, minutes: int = 15, step: int = 30)
     tle0 = tle_entry["latest"]["tle0"]
 
     return get_trajectory(tle1, tle2, tle0, minutes, step)
+
+
+@router.get("/next_passes")
+async def next_passes(limit: int = 10):
+    """
+    Get the list of upcoming satellite passes.
+
+    Args:
+        limit: Maximum number of future passes to return. Defaults to 10.
+
+    Returns:
+        A list of dictionaries, each containing:
+            - satellite_name: Name of the satellite.
+            - norad_id: NORAD catalog ID of the satellite.
+            - tle: Dictionary with TLE lines (tle0, tle1, tle2).
+            - start: Start time of the pass.
+            - end: End time of the pass.
+
+    Raises:
+        HTTPException: If the observations data cannot be fetched or is empty.
+    """
+    observation = await fetch("observations/")
+
+    future_passes = [obs for obs in observation if obs["status"] == "future" and obs.get("tle") is not None]
+    future_passes.sort(key=lambda x: x["start"])
+    future_passes = future_passes[:limit]
+
+    result = []
+    for obs in future_passes:
+        tle = obs.get("tle", {})
+        result.append({
+            "satellite_name": tle.get("tle0", "Unknown"),
+            "norad_id": obs.get("norad_cat_id"),
+                        "tle": {
+                "tle0": tle.get("tle0"),
+                "tle1": tle.get("tle1"),
+                "tle2": tle.get("tle2")
+            },
+            "start": obs.get("start"),
+            "end": obs.get("end")
+        })
+
+    return result
