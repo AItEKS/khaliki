@@ -62,11 +62,12 @@ async def station_info(id: int, altitude: int):
     return reqest
 
 @router.get("/station/history/{id}")
-async def station_hist(id: int):
+async def station_hist(id: int, limit: int = 20):
     observations = await fetch(f"observations/?ground_station={id}")
     
     filtered_obs = [obs for obs in observations if obs.get("status") != "future"]
     sorted_obs = sorted(filtered_obs, key=lambda x: x["start"], reverse=True)
+    sorted_obs = sorted_obs[:limit]
 
     result = []
     for obs in sorted_obs:
