@@ -44,11 +44,12 @@ async def satellite_trajectory(norad_id: int, minutes: int = 15, step: int = 30)
     Returns:
         A list of dictionaries with latitude, longitude, elevation, and timestamp.
     """
-    tles = await fetch("latesttles/")
-    tle_entry = next((t for t in tles if t["satellite"]["norad_cat_id"] == norad_id), None)
+    tles = await fetch("latesttles/", params={"norad_cat_id": norad_id})
 
-    if not tle_entry:
+    if not tles:
         raise HTTPException(status_code=404, detail="TLE not found")
+
+    tle_entry = tles[0]
 
     tle1 = tle_entry["latest"]["tle1"]
     tle2 = tle_entry["latest"]["tle2"]
