@@ -18,11 +18,12 @@ async def satellite_position(norad_id: int):
     Raises:
         HTTPException: If the TLE data for the given NORAD ID is not found.
     """
-    tles = await fetch("latesttles/")
-    tle_entry = next((t for t in tles if t["satellite"]["norad_cat_id"] == norad_id), None)
+    tles = await fetch("latesttles/", params={"norad_cat_id": norad_id})
 
-    if not tle_entry:
+    if not tles:
         raise HTTPException(status_code=404, detail="TLE not found")
+
+    tle_entry = tles[0]
 
     tle1 = tle_entry["latest"]["tle1"]
     tle2 = tle_entry["latest"]["tle2"]
