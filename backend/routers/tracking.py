@@ -62,6 +62,23 @@ async def satellite_trajectory(norad_id: int, minutes: int = 15, step: int = 30)
 
 @router.get("/station/next_passes/{station_id}")
 async def next_passes(station_id: int, limit: int = 10):
+    """Get the upcoming satellite passes for a given ground station.
+
+    Args:
+        station_id: The ID of the ground station.
+        limit: Maximum number of future passes to return. Defaults to 10.
+
+    Returns:
+        A list of dictionaries, each containing:
+            - satellite_name: Name of the satellite (from TLE line 0).
+            - norad_id: NORAD catalog ID of the satellite.
+            - tle: A dictionary with TLE lines (tle0, tle1, tle2).
+            - start: Start time of the pass.
+            - end: End time of the pass.
+
+    Raises:
+        HTTPException: If no future passes with TLE data are found for the station.
+    """
     observations = await fetch("observations/")
 
     future_passes = [

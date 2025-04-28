@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import ws_tracking, tracking, stations
+from backend.routers import ws_tracking, tracking, stations, satellites
 
 
 app = FastAPI(
@@ -26,3 +26,4 @@ app.add_middleware(
 app.include_router(tracking.router, prefix="/tracking", tags=["Satellite Tracking"])
 app.include_router(ws_tracking.router, tags=["Live WebSocket Tracking"])
 app.include_router(stations.router, prefix="/stations", tags=["List stations"])
+app.include_router(satellites.router, prefix="/satellites", tags=["Satellites"])
