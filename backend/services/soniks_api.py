@@ -31,20 +31,18 @@ async def fetch_all_paginated(endpoint: str, params: dict = None, page_count: in
     initial_params = params or {}
 
     page_num = 0
-    async with httpx.AsyncClient(follow_redirects=True) as client:  # ✅ Разрешаем редиректы
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         while next_url and page_num < page_count:
             page_num += 1
             response = await client.get(next_url, params=initial_params)
-            response.raise_for_status()  # Проверяем статус (4xx/5xx)
+            response.raise_for_status()
             
-            # Добавляем данные текущей страницы
             page_data = response.json()
             if isinstance(page_data, list):
                 all_data.extend(page_data)
             else:
                 all_data.append(page_data)
             
-            # Ищем ссылку на следующую страницу в заголовке Link
             link_header = response.headers.get("Link")
             if not link_header:
                 break
@@ -52,10 +50,10 @@ async def fetch_all_paginated(endpoint: str, params: dict = None, page_count: in
             next_link = None
             for link in link_header.split(","):
                 if 'rel="next"' in link:
-                    next_link = link.split(";")[0].strip()[1:-1]  # Извлекаем URL из <...>
+                    next_link = link.split(";")[0].strip()[1:-1]
                     break
 
             next_url = next_link
-            initial_params = None  # Не используем начальные параметры для последующих страниц
+            initial_params = None
 
     return all_data
