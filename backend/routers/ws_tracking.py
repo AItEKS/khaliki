@@ -26,7 +26,7 @@ async def websocket_position(websocket: WebSocket, norad_id: int):
         while True:
             position = get_satellite_coords(tle1, tle2, tle0)
             await websocket.send_json(position)
-            await asyncio.sleep(1)
+            await asyncio.sleep(5)
 
     except WebSocketDisconnect:
         print(f"Websocket {norad_id} disconnected")

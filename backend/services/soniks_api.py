@@ -28,6 +28,7 @@ from typing import List, Dict, Any
 import httpx
 from typing import List, Dict, Any
 
+
 async def fetch_all_paginated(endpoint: str, params: dict = None) -> List[Dict[str, Any]]:
     """Fetches all paginated JSON data, automatically following redirects."""
     all_data = []

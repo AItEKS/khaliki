@@ -43,9 +43,6 @@ async def satellite_trajectory(norad_id: int, minutes: int = 15, step: int = 30)
 
     Returns:
         A list of dictionaries with latitude, longitude, elevation, and timestamp.
-
-    Raises:
-        HTTPException: If the TLE data for the given NORAD ID is not found.
     """
     tles = await fetch("latesttles/")
     tle_entry = next((t for t in tles if t["satellite"]["norad_cat_id"] == norad_id), None)
@@ -89,7 +86,7 @@ async def next_passes(station_id: int, limit: int = 10):
     ]
 
     if not future_passes:
-        raise HTTPException(status_code=404, detail="No future data")
+        return []
 
     future_passes.sort(key=lambda x: x["start"])
 
