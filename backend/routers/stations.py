@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
-from backend.services.orbits import get_satellite_coords, get_trajectory
+from fastapi import APIRouter
 from backend.services.soniks_api import fetch, fetch_all_paginated
-from backend.services.calculate_satellite_coverage import calculate_satellite_coverage 
+from backend.services.calculate_satellite_coverage import calculate_satellite_coverage
+from datetime import datetime
+
 
 router = APIRouter()
 
@@ -106,8 +107,8 @@ async def station_hist(id: int, limit: int = 20):
             "norad_cat_id": obs.get("norad_cat_id"),
             "satellite_name": obs.get("tle", {}).get("tle0", "Unknown"),
             "station_name": obs.get("station_name"),
-            "start": obs.get("start"),
-            "end": obs.get("end"),
+            "start": obs.get("start")[:-1],
+            "end": obs.get("end")[:-1],
             "observation_frequency": obs.get("observation_frequency")
         })
 
