@@ -1,4 +1,5 @@
 import httpx
+from typing import List, Dict, Any
 
 
 BASE_URL = "https://sonik.space/api/"
@@ -22,21 +23,17 @@ async def fetch(endpoint: str, params: dict = None) -> any:
         response.raise_for_status()
         return response.json()
 
-import httpx
-from typing import List, Dict, Any
 
-import httpx
-from typing import List, Dict, Any
-
-
-async def fetch_all_paginated(endpoint: str, params: dict = None) -> List[Dict[str, Any]]:
+async def fetch_all_paginated(endpoint: str, params: dict = None, page_count: int = 10) -> List[Dict[str, Any]]:
     """Fetches all paginated JSON data, automatically following redirects."""
     all_data = []
     next_url = f"{BASE_URL}{endpoint}"
     initial_params = params or {}
 
+    page_num = 0
     async with httpx.AsyncClient(follow_redirects=True) as client:  # ✅ Разрешаем редиректы
-        while next_url:
+        while next_url and page_num < page_count:
+            page_num += 1
             response = await client.get(next_url, params=initial_params)
             response.raise_for_status()  # Проверяем статус (4xx/5xx)
             
@@ -46,7 +43,7 @@ async def fetch_all_paginated(endpoint: str, params: dict = None) -> List[Dict[s
                 all_data.extend(page_data)
             else:
                 all_data.append(page_data)
-
+            
             # Ищем ссылку на следующую страницу в заголовке Link
             link_header = response.headers.get("Link")
             if not link_header:
