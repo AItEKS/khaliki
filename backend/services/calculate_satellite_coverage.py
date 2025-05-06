@@ -7,37 +7,34 @@ def calculate_satellite_coverage(
     earth_radius_km: float = 6371.0
 ) -> float:
     """
-    Рассчитывает радиус зоны покрытия спутника (в км) от подспутниковой точки до границы видимости.
+    Calculates the radius of the satellite coverage area (in km) from the sub-satellite point to the visibility limit.
 
-    Параметры:
-        ground_altitude_m: Высота наземной станции над уровнем моря (в метрах)
-        min_elevation_deg: Минимальный угол возвышения (в градусах)
-        satellite_altitude_km: Высота орбиты спутника (в километрах)
-        earth_radius_km: Радиус Земли (по умолчанию 6371 км)
+    Parameters:
+    ground_altitude_m: Ground station altitude above sea level (in meters)
+    min_elevation_deg: Minimum elevation angle (in degrees)
+    satellite_altitude_km: Satellite orbit altitude (in kilometers)
+    earth_radius_km: Earth radius (default 6371 km)
 
-    Возвращает:
-        Радиус зоны покрытия в километрах. 0 если спутник не виден.
+    Returns:
+    Coverage area radius in kilometers. 0 if the satellite is not visible.
     """
     # Переводим высоту станции в километры
-    h = ground_altitude_m / 1000  
+    ground_altitude_km = ground_altitude_m / 1000
     
     # Переводим угол возвышения в радианы
-    e = math.radians(min_elevation_deg)  
-    print(e,"e")
+    elevation_rad = math.radians(min_elevation_deg)
     
     # Вычисляем ключевой параметр
-    ratio = (earth_radius_km + h) / (earth_radius_km + satellite_altitude_km) * math.cos(e)
-    print(ratio,h)
+    ratio = (earth_radius_km + ground_altitude_km) / (earth_radius_km + satellite_altitude_km) * math.cos(elevation_rad)
+    
     # Проверка на видимость спутника
     if ratio > 1:
         return 0.0
-    
+        
     # Вычисляем центральный угол
-    central_angle = math.acos(ratio) - e
-    print(central_angle)
+    central_angle = math.acos(ratio) - elevation_rad
+    
     # Рассчитываем радиус покрытия
     coverage_radius = earth_radius_km * central_angle
     
     return coverage_radius
-
-
